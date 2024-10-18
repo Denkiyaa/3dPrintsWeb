@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="/js/three.min.js"></script>
+</head>
+<body>
+  <h1><%= title %></h1>
+
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="model" accept=".stl, .obj" required>
+    <button type="submit">Upload 3D Model</button>
+  </form>
+
+  <!-- Here, you will later display uploaded models -->
+</body>
+</html>
