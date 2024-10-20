@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3500; // Use environment variable for remote server, default to 3500 for local
+const PORT = process.env.PORT || 4000; // Use environment variable for remote server, default to 3500 for local
 
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
