@@ -26,7 +26,7 @@ app.get('/models-list', (req, res) => {
     });
 });
 
-// Start the server
-app.listen(PORT, () => {
+// Listen on all interfaces (important for remote server)
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running at http://localhost:${PORT} or remote server using PORT ${PORT}`);
 });
