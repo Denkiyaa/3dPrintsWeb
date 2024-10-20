@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = 3500;
+const PORT = process.env.PORT || 3500; // Use environment variable for remote server, default to 3500 for local
 
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
@@ -28,5 +28,5 @@ app.get('/models-list', (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Server running at http://localhost:${PORT} or remote server using PORT ${PORT}`);
 });
