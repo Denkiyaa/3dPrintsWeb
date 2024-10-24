@@ -3,62 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Model Viewer</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-        }
-
-        header {
-            background-color: #333;
-            color: white;
-            padding: 10px;
-            text-align: center;
-        }
-
-        .container {
-            display: flex;
-            justify-content: space-around;  /* Center the model viewers */
-            padding: 20px;
-        }
-
-        .model-container {
-            width: 300px;  /* Set the width of each viewer */
-            height: 200px; /* Set the height of each viewer */
-            background-color: #ffffff;
-            border: 1px solid #ddd;
-        }
-
-        .content {
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-    </style>
+    <title>3D Model Gallery</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <header>
-        <h1>3D Model Viewer</h1>
-    </header>
+    <div id="model-gallery" class="gallery"></div>
 
-    <div class="container">
-        <!-- First model viewer -->
-        <div id="model-container-1" class="model-container"></div>
+    <script>
+        // Fetch the list of models from the server
+        fetch('/models-list')
+            .then(response => response.json())
+            .then(data => {
+                const gallery = document.getElementById('model-gallery');
 
-        <!-- Second model viewer -->
-        <div id="model-container-2" class="model-container"></div>
-    </div>
+                data.models.forEach(model => {
+                    // Create container for each model
+                    const modelContainer = document.createElement('div');
+                    modelContainer.classList.add('model-container');
 
-    <!-- Include Three.js and STLLoader -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="main.js"></script>
+                    // Create and append thumbnail image
+                    const img = document.createElement('img');
+                    img.src = model.thumbnailPath;
+                    img.alt = `Thumbnail for ${model.name}`;
+                    img.classList.add('thumbnail');
+                    modelContainer.appendChild(img);
+
+                    // Create and append link to individual model page
+                    const link = document.createElement('a');
+                    link.href = `/model/${model.name}`;
+                    link.textContent = `View ${model.name}`;
+                    modelContainer.appendChild(link);
+
+                    gallery.appendChild(modelContainer);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching model list:', error);
+            });
+    </script>
 </body>
 </html>
