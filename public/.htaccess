@@ -1,0 +1,11 @@
+# Enable RewriteEngine
+RewriteEngine On
+
+# Proxy requests to your Node.js server running on port 4000
+RewriteCond %{REQUEST_URI} !^/public
+RewriteRule ^(.*)$ http://127.0.0.1:4000/$1 [P,L]
+
+# Set headers for CORS to allow cross-origin requests
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type"
