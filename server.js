@@ -2,13 +2,11 @@ app.get('/model/:modelName', (req, res) => {
     const modelName = req.params.modelName;
     const modelPath = path.join(__dirname, 'public', 'models', `${modelName}.stl`);
 
-    // Check if the model exists
     fs.access(modelPath, fs.constants.F_OK, (err) => {
         if (err) {
             return res.status(404).send('Model not found');
         }
 
-        // Render an HTML page for the specific model
         res.send(`
             <!DOCTYPE html>
             <html lang="en">
@@ -24,7 +22,7 @@ app.get('/model/:modelName', (req, res) => {
                 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
                 <script>
-                    // Set up the scene, camera, and renderer for the viewer
+                    // Set up scene, camera, renderer, and controls
                     const container = document.getElementById('model-container');
                     const scene = new THREE.Scene();
                     const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 2000);
