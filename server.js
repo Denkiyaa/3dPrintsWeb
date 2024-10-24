@@ -8,6 +8,13 @@ const PORT = process.env.PORT || 4000; // Use environment variable for remote se
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
+
 // Endpoint to dynamically get the list of STL model files
 app.get('/models-list', (req, res) => {
     const modelsDir = path.join(__dirname, 'public', 'models');
