@@ -1,53 +1,39 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Model list fetch and display
     fetch('/models-list')
         .then(response => response.json())
         .then(data => {
             const gallery = document.getElementById('model-gallery');
-
             data.models.forEach(model => {
-                // Create a container for each model
                 const modelCard = document.createElement('div');
                 modelCard.classList.add('model-card');
                 modelCard.style.cursor = 'pointer';
 
-                // Add a thumbnail for the model
                 const img = document.createElement('img');
                 img.src = model.thumbnailPath || '/placeholder.png';
                 img.alt = `Thumbnail for ${model.name}`;
                 img.classList.add('thumbnail');
                 modelCard.appendChild(img);
 
-                // Add the model name below the thumbnail
                 const modelName = document.createElement('h3');
                 modelName.textContent = model.name;
                 modelName.classList.add('model-name');
                 modelCard.appendChild(modelName);
 
-                // Make the model card clickable
-                modelCard.onclick = () => {
-                    openModelViewer(model);
-                };
-
+                modelCard.onclick = () => openModelViewer(model);
                 gallery.appendChild(modelCard);
             });
         })
-        .catch(error => {
-            console.error('Error fetching model list:', error);
-        });
-});
+        .catch(error => console.error('Error fetching model list:', error));
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Dark mode toggle button event listener
+    // Dark mode toggle initialization
     const darkModeToggle = document.getElementById('dark-mode-toggle');
-
-    // Kullanıcının önceki dark mode tercihi kontrol edilir, eğer yoksa varsayılan dark mode olur
     if (localStorage.getItem('darkMode') === 'disabled') {
-        disableDarkMode(); // Aydınlık modu etkinleştirir
+        disableDarkMode();
     } else {
-        enableDarkMode(); // Varsayılan olarak karanlık modu etkinleştirir
+        enableDarkMode();
     }
 
-    // Dark mode açma ve kapatma fonksiyonları
     darkModeToggle.addEventListener('click', function () {
         if (document.body.classList.contains('dark-mode')) {
             disableDarkMode();
@@ -63,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelector('header').classList.remove('light-mode');
         document.querySelector('.model-info')?.classList.add('dark-mode');
         document.querySelector('.model-info')?.classList.remove('light-mode');
-        localStorage.setItem('darkMode', 'enabled'); // Dark mode tercihini kaydet
+        localStorage.setItem('darkMode', 'enabled');
     }
 
     function disableDarkMode() {
@@ -73,20 +59,64 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelector('header').classList.add('light-mode');
         document.querySelector('.model-info')?.classList.remove('dark-mode');
         document.querySelector('.model-info')?.classList.add('light-mode');
-        localStorage.setItem('darkMode', 'disabled'); // Light mode tercihini kaydet
+        localStorage.setItem('darkMode', 'disabled');
+    }
+
+    // Check for a specific model in the URL and load it if present
+    const currentModelName = window.location.pathname.split('/model/')[1];
+    if (currentModelName) {
+        openModelViewer({
+            name: decodeURIComponent(currentModelName),
+            modelPath: `/models/${decodeURIComponent(currentModelName)}.stl`,
+            thumbnailPath: `/thumbnails/${decodeURIComponent(currentModelName)}.png`
+        }, replace = true); // Sayfa yenilendiğinde mevcut durumu replaceState ile ekle
     }
 });
 
+window.addEventListener('popstate', function (event) {
+    if (event.state && event.state.model) {
+        openModelViewer({
+            name: event.state.model,
+            modelPath: `/models/${event.state.model}.stl`,
+            thumbnailPath: `/thumbnails/${event.state.model}.png`
+        });
+    } else {
+        loadGallery();
+    }
+});
+
+function loadGallery() {
+    // Anasayfayı yeniden yükleyen fonksiyon
+    const gallery = document.getElementById('model-gallery');
+    gallery.innerHTML = '';  // Galeriyi temizler
+    // Galeriyi tekrar yüklemek için `fetch` çağrısını burada yapabilirsiniz
+    fetch('/models-list')
+        .then(response => response.json())
+        .then(data => {
+            // Galeriyi yeniden oluşturur
+            data.models.forEach(model => {
+                const modelCard = document.createElement('div');
+                modelCard.classList.add('model-card');
+                // Diğer kart içeriği burada
+                gallery.appendChild(modelCard);
+            });
+        });
+}
+
 
 // Function to create the model viewer page
-function openModelViewer(model) {
-    // Update the URL to reflect the selected model
+function openModelViewer(model, replace = false) {
     const newUrl = `${window.location.origin}/model/${encodeURIComponent(model.name)}`;
-    history.pushState({ model: model.name }, `Model Viewer - ${model.name}`, newUrl);
+
+    // `replace` parametresi varsa replaceState, yoksa pushState kullan
+    if (replace) {
+        history.replaceState({ model: model.name }, `Model Viewer - ${model.name}`, newUrl);
+    } else {
+        history.pushState({ model: model.name }, `Model Viewer - ${model.name}`, newUrl);
+    }
 
     // Clear the existing content
     document.body.innerHTML = `
-        <button class="back-button" onclick="window.history.back();">◀️</button>
         <header>
             <h1 class="model-title">Model Viewer - ${model.name}</h1>
         </header>
