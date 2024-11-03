@@ -36,13 +36,55 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    // Dark mode toggle button event listener
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+    // Kullanıcının önceki dark mode tercihi kontrol edilir, eğer yoksa varsayılan dark mode olur
+    if (localStorage.getItem('darkMode') === 'disabled') {
+        disableDarkMode(); // Aydınlık modu etkinleştirir
+    } else {
+        enableDarkMode(); // Varsayılan olarak karanlık modu etkinleştirir
+    }
+
+    // Dark mode açma ve kapatma fonksiyonları
+    darkModeToggle.addEventListener('click', function () {
+        if (document.body.classList.contains('dark-mode')) {
+            disableDarkMode();
+        } else {
+            enableDarkMode();
+        }
+    });
+
+    function enableDarkMode() {
+        document.body.classList.add('dark-mode');
+        document.body.classList.remove('light-mode');
+        document.querySelector('header').classList.add('dark-mode');
+        document.querySelector('header').classList.remove('light-mode');
+        document.querySelector('.model-info')?.classList.add('dark-mode');
+        document.querySelector('.model-info')?.classList.remove('light-mode');
+        localStorage.setItem('darkMode', 'enabled'); // Dark mode tercihini kaydet
+    }
+
+    function disableDarkMode() {
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('light-mode');
+        document.querySelector('header').classList.remove('dark-mode');
+        document.querySelector('header').classList.add('light-mode');
+        document.querySelector('.model-info')?.classList.remove('dark-mode');
+        document.querySelector('.model-info')?.classList.add('light-mode');
+        localStorage.setItem('darkMode', 'disabled'); // Light mode tercihini kaydet
+    }
+});
+
+
 // Function to create the model viewer page
 function openModelViewer(model) {
     // Clear the existing content
     document.body.innerHTML = `
-        <button class="back-button" onclick="history.back()"> ⏎ </button>
+        <button class="back-button" onclick="window.location.href = document.referrer;">◀️</button>
         <header>
-            <h1>Model Viewer - ${model.name}</h1>
+            <h1 class="model-title">Model Viewer - ${model.name}</h1>
         </header>
         <div class="model-viewer-layout">
             <div class="model-viewer-container">
@@ -50,7 +92,7 @@ function openModelViewer(model) {
             </div>
             <div class="model-info">
                 <h2>Model Information</h2>
-                <p><strong>Model Name:</strong> ${model.name}</p>
+                <p class="model-name"><strong>Model Name:</strong> ${model.name}</p>
                 <p><strong>Description:</strong> Detailed information about the model can be provided here.</p>
                 <p><strong>Dimensions:</strong> Placeholder for dimensions, etc.</p>
             </div>
@@ -114,7 +156,14 @@ function setupViewer(containerId, modelPath, modelName) {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(container.offsetWidth, container.offsetHeight);
-    renderer.setClearColor(new THREE.Color('rgb(230, 230, 230)'));  // Set a light gray background
+
+    // Arka plan rengini dark mode veya light mode'a uygun olarak ayarla
+    if (document.body.classList.contains('dark-mode')) {
+        renderer.setClearColor(new THREE.Color('rgb(34, 34, 34)'));  // Dark mode için koyu gri arka plan
+    } else {
+        renderer.setClearColor(new THREE.Color('rgb(230, 230, 230)'));  // Light mode için açık gri arka plan
+    }
+    
     container.appendChild(renderer.domElement);
 
     // Add controls for model interaction
@@ -172,6 +221,7 @@ function setupViewer(containerId, modelPath, modelName) {
         renderer.setSize(container.offsetWidth, container.offsetHeight);
     });
 }
+
 
 // Helper function to rotate the model onto its flat side and adjust vertical position
 function adjustModel(mesh, scene) {
