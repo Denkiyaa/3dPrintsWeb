@@ -105,10 +105,17 @@ function openModelViewer(model) {
 
 function createDynamicGround(scene, modelSize) {
     const groundPaddingFactor = 2;  // Ground size is larger to give some padding around the model
-    const constantTileSize = 5;  // Size of individual tiles
+    let constantTileSize = 5;  // Default size of individual tiles
 
     // Determine the largest model dimension (either X or Z)
     const largestDimension = Math.max(modelSize.x, modelSize.z);
+
+    // Adjust tile size based on model size to maintain good visual proportions
+    if (largestDimension > 50) {
+        constantTileSize = largestDimension / 10;  // Büyük modellerde daha büyük kareler olsun
+    } else if (largestDimension < 10) {
+        constantTileSize = largestDimension / 2;  // Küçük modellerde daha küçük ama uygun kareler olsun
+    }
 
     // Calculate the size of the ground based on the model's largest dimension
     const groundSize = largestDimension * groundPaddingFactor;
@@ -122,10 +129,10 @@ function createDynamicGround(scene, modelSize) {
     checkeredCanvas.height = divisions;
     const ctx = checkeredCanvas.getContext('2d');
 
-    // Create a checkerboard pattern
+    // Create a checkerboard pattern with contrasting colors
     for (let i = 0; i < divisions; i++) {
         for (let j = 0; j < divisions; j++) {
-            ctx.fillStyle = (i + j) % 2 === 0 ? '#cccccc' : '#333333';
+            ctx.fillStyle = (i + j) % 2 === 0 ? '#444444' : '#888888'; // Daha belirgin gri tonları
             ctx.fillRect(i, j, 1, 1);
         }
     }
@@ -140,9 +147,12 @@ function createDynamicGround(scene, modelSize) {
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = -Math.PI / 2;  // Rotate to lie flat on XZ plane
     ground.position.y = 0;  // Set ground to Y=0
+    ground.receiveShadow = true;
 
     scene.add(ground);  // Add the ground to the scene
 }
+
+
 
 function setupViewer(containerId, modelPath, modelName) {
     const container = document.getElementById(containerId);
@@ -156,14 +166,15 @@ function setupViewer(containerId, modelPath, modelName) {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(container.offsetWidth, container.offsetHeight);
+    renderer.shadowMap.enabled = true; // Gölge etkisini etkinleştir
 
-    // Arka plan rengini dark mode veya light mode'a uygun olarak ayarla
+    // Dark mode veya light mode'a uygun arka plan rengini ayarla
     if (document.body.classList.contains('dark-mode')) {
-        renderer.setClearColor(new THREE.Color('rgb(34, 34, 34)'));  // Dark mode için koyu gri arka plan
+        renderer.setClearColor(new THREE.Color('#202123'));  // Dark mode: koyu gri-siyah
     } else {
-        renderer.setClearColor(new THREE.Color('rgb(230, 230, 230)'));  // Light mode için açık gri arka plan
+        renderer.setClearColor(new THREE.Color('#f0f0f0'));  // Light mode: açık gri
     }
-    
+
     container.appendChild(renderer.domElement);
 
     // Add controls for model interaction
@@ -171,19 +182,22 @@ function setupViewer(containerId, modelPath, modelName) {
     controls.enableDamping = true;
 
     // Add lights for illumination
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
 
-    const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
-    hemisphereLight.position.set(0, 1, 0);
-    scene.add(hemisphereLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(10, 20, 10);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
 
     // Load and add the model to the scene
     const loader = new THREE.STLLoader();
     loader.load(modelPath, function (geometry) {
         geometry.center();  // Center geometry to adjust pivot
-        const material = new THREE.MeshStandardMaterial({ color: 0x606060 });
+        const material = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.5, metalness: 0.1 });
         const mesh = new THREE.Mesh(geometry, material);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
         scene.add(mesh);
 
         adjustModel(mesh, scene);  // Rotate and adjust model position
@@ -221,6 +235,7 @@ function setupViewer(containerId, modelPath, modelName) {
         renderer.setSize(container.offsetWidth, container.offsetHeight);
     });
 }
+
 
 
 // Helper function to rotate the model onto its flat side and adjust vertical position
