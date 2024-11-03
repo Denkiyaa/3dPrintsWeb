@@ -38,6 +38,11 @@ app.get('/models-list', (req, res) => {
     });
 });
 
+// Wildcard route to handle all other requests (important for client-side routing)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // Listen on all interfaces (important for remote server)
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running at http://localhost:${PORT}`);
