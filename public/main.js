@@ -80,9 +80,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Function to create the model viewer page
 function openModelViewer(model) {
+    // Update the URL to reflect the selected model
+    const newUrl = `${window.location.origin}/model/${encodeURIComponent(model.name)}`;
+    history.pushState({ model: model.name }, `Model Viewer - ${model.name}`, newUrl);
+
     // Clear the existing content
     document.body.innerHTML = `
-        <button class="back-button" onclick="window.location.href = document.referrer;">◀️</button>
+        <button class="back-button" onclick="window.history.back();">◀️</button>
         <header>
             <h1 class="model-title">Model Viewer - ${model.name}</h1>
         </header>
@@ -101,6 +105,21 @@ function openModelViewer(model) {
 
     setupViewer('model-container', model.modelPath, model.name);
 }
+
+// Event listener for handling the browser's back and forward buttons
+window.addEventListener('popstate', function (event) {
+    if (event.state && event.state.model) {
+        // If a state exists in history, open the corresponding model viewer
+        openModelViewer({
+            name: event.state.model,
+            modelPath: `/models/${event.state.model}.stl`,
+            thumbnailPath: `/thumbnails/${event.state.model}.png`
+        });
+    } else {
+        // If no specific state, go back to main gallery
+        location.reload(); // Or implement a function to reload the main gallery without a full page refresh
+    }
+});
 
 
 function createDynamicGround(scene, modelSize) {
