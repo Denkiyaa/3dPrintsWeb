@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function openModelViewer(model) {
     // Clear the existing content
     document.body.innerHTML = `
-        <button class="back-button" onclick="window.location.href='/'">Back to Main Page</button>
+        <button class="back-button" onclick="history.back()"> ⏎ </button>
         <header>
             <h1>Model Viewer - ${model.name}</h1>
         </header>
@@ -59,6 +59,7 @@ function openModelViewer(model) {
 
     setupViewer('model-container', model.modelPath, model.name);
 }
+
 
 function createDynamicGround(scene, modelSize) {
     const groundPaddingFactor = 2;  // Ground size is larger to give some padding around the model
