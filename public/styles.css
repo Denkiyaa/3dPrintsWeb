@@ -3,6 +3,8 @@ body {
     background-color: #202123; /* Ana arka plan: koyu gri-siyah */
     color: #e8eaed; /* Açık gri metin rengi */
     transition: background-color 0.5s, color 0.5s;
+    margin: 0;
+    padding: 0;
 }
 
 body.light-mode {
@@ -25,11 +27,25 @@ header {
     justify-content: center;
     align-items: center;
     height: 60px;
+    z-index: 1000;
 }
 
 header h1 {
     margin: 0;
     font-size: 1.5em;
+    cursor: pointer;
+}
+
+header .home-link {
+    margin: 0;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #fff;
+    text-decoration: none;
+}
+
+#content {
+    margin-top: 60px; /* Sabit başlık yüksekliği kadar içerik bölgesine boşluk ekler */
 }
 
 header.light-mode {
@@ -74,7 +90,7 @@ main {
 }
 
 .model-name {
-    text-align: center;
+    text-align: left;
     padding: 10px 0;
     font-size: 1.1em;
     color: #e8eaed; /* Açık gri metin */
@@ -200,9 +216,9 @@ body.light-mode .model-info p strong {
 
 /* Ayar Tuşları Kapsayıcısı */
 .settings-container {
-    position: absolute;
-    top: 15px;
-    right: 20px;
+    margin-left: auto; /* Ayarlar düğmelerini sağa yaslar */
+    display: flex;
+    gap: 10px;
 }
 
 /* Model Title Styling in Header */

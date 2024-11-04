@@ -86,6 +86,7 @@ window.addEventListener('popstate', function (event) {
 });
 
 function loadGallery() {
+    window.location.href = '/'; // Ana sayfaya yönlendir
     // Anasayfayı yeniden yükleyen fonksiyon
     const gallery = document.getElementById('model-gallery');
     gallery.innerHTML = '';  // Galeriyi temizler
@@ -115,23 +116,20 @@ function openModelViewer(model, replace = false) {
         history.pushState({ model: model.name }, `Model Viewer - ${model.name}`, newUrl);
     }
 
-    // Clear the existing content
-    document.body.innerHTML = `
-        <header>
-            <h1 class="model-title">Model Viewer - ${model.name}</h1>
-        </header>
-        <div class="model-viewer-layout">
-            <div class="model-viewer-container">
-                <div id="model-container" class="viewer"></div>
-            </div>
-            <div class="model-info">
-                <h2>Model Information</h2>
-                <p class="model-name"><strong>Model Name:</strong> ${model.name}</p>
-                <p><strong>Description:</strong> Detailed information about the model can be provided here.</p>
-                <p><strong>Dimensions:</strong> Placeholder for dimensions, etc.</p>
-            </div>
-        </div>
-    `;
+    // Clear the existing content, but keep the site header
+    document.querySelector('main').innerHTML = `
+ <div class="model-viewer-layout">
+     <div class="model-viewer-container">
+         <div id="model-container" class="viewer"></div>
+     </div>
+     <div class="model-info">
+         <h2>Model Information</h2>
+         <p class="model-name"><strong>Model Name:</strong> ${model.name}</p>
+         <p><strong>Description:</strong> Detailed information about the model can be provided here.</p>
+         <p><strong>Dimensions:</strong> Placeholder for dimensions, etc.</p>
+     </div>
+ </div>
+`;
 
     setupViewer('model-container', model.modelPath, model.name);
 }
